@@ -89,6 +89,7 @@ class TrafficSkill(MycroftSkill):
             LOGGER.error(response.json())
 
         else:
+            LOGGER.debug("API Respose: %s" % response.json())
             routes = response.json()['routes'][0]
             legs = routes['legs'][0]
             duration_norm = int(legs['duration']['value']/60) # In minutes
