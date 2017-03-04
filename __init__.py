@@ -85,11 +85,12 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("API Request: %s" % api_url)
         response = requests.get(api_url)
 
-        if response.status_code != 200:
+        if reponse.status_code == requests.codes.ok and response.status == "REQUEST_DENIED":
             LOGGER.error(response.json())
+            self.speak_dialog('traffic.error.api')
 
-        else:
-            LOGGER.debug("API Respose: %s" % response.json())
+        elif response.status_code == requests.codes.ok:
+            LOGGER.debug("API Response: %s" % response.json())
             routes = response.json()['routes'][0]
             legs = routes['legs'][0]
             duration_norm = int(legs['duration']['value']/60) # In minutes
@@ -108,16 +109,19 @@ class TrafficSkill(MycroftSkill):
             else:
                 LOGGER.debug("Traffic = Clear")
                 self.speak_dialog('traffic.clear', data={'destination': destination,
-                                                         'trip_time': duration_norm})
+                                                        'trip_time': duration_norm})
+
+        else:
+            LOGGER.error(response.json())
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
         return address_converted
 
-    def stop(self):
-        self.speak_dialog('traffic.module.halting')
-        self.process.terminate()
-        self.process.wait()
+    #def stop(self):
+        #self.speak_dialog('traffic.module.halting')
+        #self.process.terminate()
+        #self.process.wait()
 
 
 
