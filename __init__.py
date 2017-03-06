@@ -59,7 +59,7 @@ class TrafficSkill(MycroftSkill):
         self.request_drive_time(message, depart_time_now, self.api_key)
 
     def get_drive_time_at(self, message):
-        depart_time = str(int(time())) # Figure out requested time
+        depart_time = str(int(time())) # TODO - Figure out requested time
         self.request_drive_time(message, depart_time, self.api_key)
 
     def request_drive_time(self, message, depart_time, api_key):
@@ -85,12 +85,12 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("API Request: %s" % api_url)
         response = requests.get(api_url)
 
-        if reponse.status_code == requests.codes.ok and response.status == "REQUEST_DENIED":
+        if response.status_code == requests.codes.ok and response.json()['status'] == "REQUEST_DENIED":
             LOGGER.error(response.json())
             self.speak_dialog('traffic.error.api')
 
         elif response.status_code == requests.codes.ok:
-            LOGGER.debug("API Response: %s" % response.json())
+            LOGGER.debug("API Response: %s" % response)
             routes = response.json()['routes'][0]
             legs = routes['legs'][0]
             duration_norm = int(legs['duration']['value']/60) # In minutes
@@ -118,11 +118,11 @@ class TrafficSkill(MycroftSkill):
         address_converted = sub(' ', '+', address)
         return address_converted
 
-    #def stop(self):
-        #self.speak_dialog('traffic.module.halting')
+    def stop(self):
+        self.speak_dialog('traffic.module.halting')
         #self.process.terminate()
         #self.process.wait()
-
+        pass
 
 
 def create_skill():
