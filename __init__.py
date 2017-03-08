@@ -34,7 +34,7 @@ class TrafficSkill(MycroftSkill):
     def __init__(self):
         super(TrafficSkill, self).__init__("TrafficSkill")
         self.api_key = self.config.get('api_key')
-        self.debug = True
+        self.debug = False
 
     def initialize(self):
         self.load_data_files(dirname(__file__))
@@ -65,14 +65,16 @@ class TrafficSkill(MycroftSkill):
     def request_drive_time(self, message, depart_time, api_key):
         poi_dict = self.config.get('pois')
         LOGGER.debug("POI: %s" % poi_dict)
-        #destination = message.metadata.get("destination")
-        #origin = message.metadata.get("origin")
-        if self.debug:
-            destination = "1339 Broad St, Clifton, NJ, 07013"
-            origin = "13 Hague St, Jersey City, NJ 07307"
+        LOGGER.debug("Message: %s" % message.data())
+        destination = message.data.get("Destination")
+        origin = message.data.get("Origin")
+        if origin == None:
+            origin = 'home'
+        orig_addr = self.__get_address(origin)
+        dest_addr = self.__get_address(destination)
         LOGGER.debug("Origin: %s" % origin)
         LOGGER.debug("Destination: %s" % destination)
-        self.speak_dialog("welcome", data={'destination': destination})
+        self.speak_dialog("welcome", data={'destination': destination, 'origin': origin})
         orig_enc = self.__convert_address(origin)
         dest_enc = self.__convert_address(destination)
         api_root = 'https://maps.googleapis.com/maps/api/directions/json'
