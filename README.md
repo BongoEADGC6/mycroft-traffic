@@ -16,7 +16,7 @@ git clone https://github.com/BongoEADGC6/mycroft-traffic.git TrafficSkill
 
 ## Configuration
 First, you need to obtain an API key from the Google Developers Console and enabling the Google Directions API.
-This can be done by following [this link](https://console.developers.google.com/apis/api/directions_backend?project=)
+This can be done by following [this link](https://console.developers.google.com/apis/api/directions_backend?project=).
 
 Add a block to your `~/.mycroft/mycroft.conf` file like this:
 
