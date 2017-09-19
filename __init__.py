@@ -24,7 +24,7 @@ from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill
 from mycroft.util.log import getLogger
 
-__author__ = 'chults'
+__author__ = 'BONGEADGC6'
 
 LOGGER = getLogger(__name__)
 
@@ -162,7 +162,7 @@ class TrafficSkill(MycroftSkill):
         return address_converted
 
     def stop(self):
-        self.speak_dialog('traffic.module.halting')
+        #self.speak_dialog('traffic.module.halting')
         #self.process.terminate()
         #self.process.wait()
         pass

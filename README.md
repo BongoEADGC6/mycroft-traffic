@@ -36,7 +36,28 @@ Add a block to your `~/.mycroft/mycroft.conf` file like this:
 
 ## Usage
 
+"Hey Mycroft, how long is my trip to work?". 
+This will return your travel time, and if there is any traffic how much there is.
+
+
+## Supported Phrases/Entities
+Currently the phrases are:
+* Hey Mycroft, how long is my trip to X? (Where X is a configured POI)
+
+
 
 ## TODO
+* Include required start or arrival time
 
- * Be able to query for non-configured locations.
+## In Development
+* Be able to query for non-configured locations. (i.e. "How close is the nearest bank?")
+
+
+## Contributing
+
+All contributions welcome:
+
+* Fork
+* Write code
+* Submit pull request
+
