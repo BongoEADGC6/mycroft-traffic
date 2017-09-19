@@ -20,6 +20,7 @@ from time import time
 from os.path import dirname, join
 import requests
 
+
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill
 from mycroft.util.log import getLogger
@@ -61,7 +62,7 @@ class TrafficSkill(MycroftSkill):
     def __build_proximity_intent(self):
         intent = IntentBuilder("ProximityIntent").require("TrafficKeyword")\
             .require("Destination").optionally("Origin").build()
-        self.register_intent(intent, self.handle_traffic_now_intent)
+        self.register_intent(intent, self.handle_proximity_intent)
 
     def handle_traffic_now_intent(self, message):
         try:
@@ -73,9 +74,15 @@ class TrafficSkill(MycroftSkill):
 
     def handle_traffic_later_intent(self, message):
         try:
-            LOGGER.debug("Config Data: %s" % self.config)
             depart_time_now = str(int(time()))
             self.request_drive_time(message, depart_time_now, self.api_key)
+        except Exception as err:
+            LOGGER.error("Error: {0}".format(err))
+
+    def handle_proximity_intent(self, message):
+        try:
+            depart_time_now = str(int(time()))
+            self.request_distance(message, depart_time_now, self.api_key)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
@@ -178,6 +185,7 @@ class TrafficSkill(MycroftSkill):
 
         else:
             LOGGER.error(response.json())
+
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
