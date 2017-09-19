@@ -186,7 +186,6 @@ class TrafficSkill(MycroftSkill):
         else:
             LOGGER.error(response.json())
 
-
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
         return address_converted
