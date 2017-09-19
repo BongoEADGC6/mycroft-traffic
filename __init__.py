@@ -1,20 +1,3 @@
-# Copyright 2016 Mycroft AI, Inc.
-#
-# This file is part of Mycroft Core.
-#
-# Mycroft Core is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Mycroft Core is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Mycroft Core.  If not, see <http://www.gnu.org/licenses/>.
-
 from re import sub
 from time import time
 from os.path import dirname, join
@@ -29,19 +12,35 @@ __author__ = 'BONGEADGC6'
 
 LOGGER = getLogger(__name__)
 
+class GoogleMapsClient(object):
+
+    def __init__(self, api_key=None):
+        import googlemaps
+        try:
+            gmaps = googlemaps.Client(key=api_key)
+        except ValueError:
+            return
+
+    def gTraffic(self):
+        LOGGER.debug('Google Traffic')
+
+    def gDistance(self):
+        LOGGER.debug('Google Distance')
 
 class TrafficSkill(MycroftSkill):
 
     def __init__(self):
         super(TrafficSkill, self).__init__("TrafficSkill")
-        self.__init_traffic()
-        self.debug = False
-
-    def __init_traffic(self):
-        self.api_key = self.config.get('api_key')
+        # TODO - Allow more providers (i.e. Google, OpenStreetMap, etc.)
+        provider = self.config.get('provider', 'google')
+        if provider == 'google':
+            self.maps = GoogleMapsClient(
+                self.config.get('api_key'),
+                )
         self.poi_dict = self.config.get('pois')
 
     def initialize(self):
+        self.language = self.config_core.get('lang')
         self.load_data_files(dirname(__file__))
         self.load_vocab_files(join(dirname(__file__), 'vocab', self.lang))
         self.load_regex_files(join(dirname(__file__), 'regex', self.lang))

@@ -34,7 +34,7 @@ Add a block to your `~/.mycroft/mycroft.conf` file like this:
   }
 }
 ```
-* API key can be obtained [HERE](https://developers.google.com/maps/documentation/directions/start#get-a-key)
+* Google API key can be obtained [HERE](https://developers.google.com/maps/documentation/directions/start#get-a-key)
 
 ## Usage
 
@@ -50,6 +50,7 @@ Currently the phrases are:
 
 ## TODO
 * Include required start or arrival time
+* Include alternatives for navigation other than Google Maps API
 
 ## In Development
 * Be able to query for non-configured locations. (i.e. "How close is the nearest bank?")
