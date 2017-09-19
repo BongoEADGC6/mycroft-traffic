@@ -12,6 +12,7 @@ __author__ = 'BONGEADGC6'
 
 LOGGER = getLogger(__name__)
 
+
 class GoogleMapsClient(object):
 
     def __init__(self, api_key=None):
@@ -26,6 +27,7 @@ class GoogleMapsClient(object):
 
     def gDistance(self):
         LOGGER.debug('Google Distance')
+
 
 class TrafficSkill(MycroftSkill):
 
