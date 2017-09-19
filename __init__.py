@@ -44,38 +44,51 @@ class TrafficSkill(MycroftSkill):
         self.load_data_files(dirname(__file__))
         self.load_vocab_files(join(dirname(__file__), 'vocab', self.lang))
         self.load_regex_files(join(dirname(__file__), 'regex', self.lang))
-        self.__build_traffic_intent()
+        self.__build_traffic_now_intent()
+        self.__build_traffic_later_intent()
+        self.__build_proximity_intent()
 
-    def __build_traffic_intent(self):
+    def __build_traffic_now_intent(self):
         intent = IntentBuilder("TrafficNowIntent").require("TrafficKeyword")\
-                   .require("Destination").optionally("Origin").build()
+            .require("Destination").optionally("Origin").build()
+        self.register_intent(intent, self.handle_traffic_now_intent)
+
+    def __build_traffic_later_intent(self):
+        intent = IntentBuilder("TrafficLaterIntent").require("TrafficKeyword")\
+            .require("Destination").optionally("Origin").build()
+        self.register_intent(intent, self.handle_traffic_now_intent)
+
+    def __build_proximity_intent(self):
+        intent = IntentBuilder("ProximityIntent").require("TrafficKeyword")\
+            .require("Destination").optionally("Origin").build()
         self.register_intent(intent, self.handle_traffic_now_intent)
 
     def handle_traffic_now_intent(self, message):
         try:
             LOGGER.debug("Config Data: %s" % self.config)
-            self.get_drive_time_now(message)
+            depart_time_now = str(int(time()))
+            self.request_drive_time(message, depart_time_now, self.api_key)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
-    def get_drive_time_now(self, message):
-        depart_time_now = str(int(time()))
-        self.request_drive_time(message, depart_time_now, self.api_key)
-
-    def get_drive_time_at(self, message):
-        depart_time = str(int(time())) # TODO - Figure out requested time
-        self.request_drive_time(message, depart_time, self.api_key)
+    def handle_traffic_later_intent(self, message):
+        try:
+            LOGGER.debug("Config Data: %s" % self.config)
+            depart_time_now = str(int(time()))
+            self.request_drive_time(message, depart_time_now, self.api_key)
+        except Exception as err:
+            LOGGER.error("Error: {0}".format(err))
 
     def build_itinerary(self, message):
         LOGGER.debug("POIs: %s" % self.poi_dict)
         spoken_dest = message.data.get("Destination")
-        spoken_origin = message.data.get("Origin")
-        if spoken_origin == None:
-            spoken_origin = 'home'
+        spkn_origin = message.data.get("Origin")
+        if spkn_origin is None:
+            spkn_origin = 'home'
         poi_users = self.poi_dict.keys()
         LOGGER.debug("POI Users: %s" % poi_users)
         for user in poi_users:
-            if user in spoken_origin:
+            if user in spkn_origin:
                 origin_profile = user
             else:
                 origin_profile = 'default'
@@ -85,13 +98,13 @@ class TrafficSkill(MycroftSkill):
                 dest_profile = 'default'
         LOGGER.debug("Loading origin from profile...")
         try:
-            origin_addr = self.poi_dict[origin_profile]['origins'][spoken_origin]
+            origin_addr = self.poi_dict[origin_profile]['origins'][spkn_origin]
         except Exception as err:
-            LOGGER.error("Falling back to home as origin... Error Message: %s" % err)
-            spoken_origin = "home"
+            LOGGER.error("Falling back to home as origin -- %s" % err)
+            spkn_origin = "home"
             origin_addr = self.poi_dict[origin_profile]['origins']['home']
         LOGGER.debug("Origin Profile: %s" % origin_profile)
-        LOGGER.debug("Origin Name: %s" % spoken_origin)
+        LOGGER.debug("Origin Name: %s" % spkn_origin)
         LOGGER.debug("Origin Address: %s" % origin_addr)
         LOGGER.debug("Loading destination from profile...")
 
@@ -101,11 +114,11 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("Destination Address: %s" % dest_addr)
         spoken_depart_time = message.data.get("Depart")
         itinerary_dict = {
-                'origin_name': spoken_origin,
-                'origin': origin_addr,
-                'dest_name': spoken_dest,
-                'destination': dest_addr,
-                }
+            'origin_name': spkn_origin,
+            'origin': origin_addr,
+            'dest_name': spoken_dest,
+            'destination': dest_addr,
+            }
         LOGGER.debug("Itinerary:: %s" % itinerary_dict)
         return itinerary_dict
 
@@ -115,7 +128,9 @@ class TrafficSkill(MycroftSkill):
     def request_drive_time(self, message, depart_time, api_key):
         poi_dict = self.config.get('pois')
         itinerary = self.build_itinerary(message)
-        self.speak_dialog("welcome", data={'destination': itinerary['dest_name'], 'origin': itinerary['origin_name']})
+        self.speak_dialog("welcome",
+                          data={'destination': itinerary['dest_name'],
+                                'origin': itinerary['origin_name']})
         orig_enc = self.__convert_address(itinerary['origin'])
         dest_enc = self.__convert_address(itinerary['destination'])
         api_root = 'https://maps.googleapis.com/maps/api/directions/json'
@@ -128,7 +143,8 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("API Request: %s" % api_url)
         response = requests.get(api_url)
 
-        if response.status_code == requests.codes.ok and response.json()['status'] == "REQUEST_DENIED":
+        if response.status_code == requests.codes.ok and \
+                response.json()['status'] == "REQUEST_DENIED":
             LOGGER.error(response.json())
             self.speak_dialog('traffic.error.api')
 
@@ -136,23 +152,29 @@ class TrafficSkill(MycroftSkill):
             LOGGER.debug("API Response: %s" % response)
             routes = response.json()['routes'][0]
             legs = routes['legs'][0]
-            duration_norm = int(legs['duration']['value']/60) # In minutes
-            duration_traffic = int(legs['duration_in_traffic']['value']/60) # In minutes
+            # convert time to minutes
+            duration_norm = int(legs['duration']['value']/60)
+            duration_traffic = int(legs['duration_in_traffic']['value']/60)
             traffic_time = duration_traffic - duration_norm
-            if traffic_time >= 30:
+            # If traffic greater than 20 minutes, consider traffic heavy
+            if traffic_time >= 20:
                 LOGGER.debug("Traffic = Heavy")
-                self.speak_dialog('traffic.heavy', data={'destination': itinerary['dest_name'],
-                                                         'trip_time': duration_norm,
-                                                         'traffic_time': traffic_time})
-            elif traffic_time >= 10:
+                self.speak_dialog('traffic.heavy',
+                                  data={'destination': itinerary['dest_name'],
+                                        'trip_time': duration_norm,
+                                        'traffic_time': traffic_time})
+            # If traffic between 5 and 20 minutes, consider traffic a delay
+            elif traffic_time >= 5:
                 LOGGER.debug("Traffic = Delay")
-                self.speak_dialog('traffic.delay', data={'destination': itinerary['dest_name'],
-                                                         'trip_time': duration_norm,
-                                                         'traffic_time': traffic_time})
+                self.speak_dialog('traffic.delay',
+                                  data={'destination': itinerary['dest_name'],
+                                        'trip_time': duration_norm,
+                                        'traffic_time': traffic_time})
             else:
                 LOGGER.debug("Traffic = Clear")
-                self.speak_dialog('traffic.clear', data={'destination': itinerary['dest_name'],
-                                                        'trip_time': duration_norm})
+                self.speak_dialog('traffic.clear',
+                                  data={'destination': itinerary['dest_name'],
+                                        'trip_time': duration_norm})
 
         else:
             LOGGER.error(response.json())
@@ -162,12 +184,11 @@ class TrafficSkill(MycroftSkill):
         return address_converted
 
     def stop(self):
-        #self.speak_dialog('traffic.module.halting')
-        #self.process.terminate()
-        #self.process.wait()
+        # self.speak_dialog('traffic.module.halting')
+        # self.process.terminate()
+        # self.process.wait()
         pass
 
 
 def create_skill():
     return TrafficSkill()
-

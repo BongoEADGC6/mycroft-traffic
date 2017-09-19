@@ -33,6 +33,7 @@ Add a block to your `~/.mycroft/mycroft.conf` file like this:
   }
 }
 ```
+* API key can be obtained [HERE](https://developers.google.com/maps/documentation/directions/start#get-a-key)
 
 ## Usage
 
