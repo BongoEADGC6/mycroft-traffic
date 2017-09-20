@@ -1,0 +1,257 @@
+{
+    "bounds": {
+        "northeast": {
+            "lat": 40.6697856,
+            "lng": -74.4586063
+        },
+        "southwest": {
+            "lat": 40.5926952,
+            "lng": -74.482766
+        }
+    },
+    "copyrights": "Map data \u00a92017 Google",
+    "legs": [
+        {
+            "distance": {
+                "text": "7.4 mi",
+                "value": 11977
+            },
+            "duration": {
+                "text": "18 mins",
+                "value": 1060
+            },
+            "end_address": "977 Valley Rd, Gillette, NJ 07933, USA",
+            "end_location": {
+                "lat": 40.6697856,
+                "lng": -74.48012539999999
+            },
+            "start_address": "145 Front St, Dunellen, NJ 08812, USA",
+            "start_location": {
+                "lat": 40.5949246,
+                "lng": -74.4603079
+            },
+            "steps": [
+                {
+                    "distance": {
+                        "text": "0.2 mi",
+                        "value": 387
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 72
+                    },
+                    "end_location": {
+                        "lat": 40.5926952,
+                        "lng": -74.4638208
+                    },
+                    "html_instructions": "Head <b>southwest</b> on <b>Front St</b> toward <b>Jackson Ave</b>",
+                    "polyline": {
+                        "points": "guwvF|_neMzCtFpEjIZj@p@nA"
+                    },
+                    "start_location": {
+                        "lat": 40.5949246,
+                        "lng": -74.4603079
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "1.8 mi",
+                        "value": 2944
+                    },
+                    "duration": {
+                        "text": "5 mins",
+                        "value": 304
+                    },
+                    "end_location": {
+                        "lat": 40.61307619999999,
+                        "lng": -74.4731262
+                    },
+                    "html_instructions": "Turn <b>right</b> onto <b>N Washington Ave</b>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "kgwvFzuneMyClDQRkCxCyCfD{CnD{CjDyChDgDzD}@bAWZcG~Gm@p@u@z@iF`GmCzCkBvBY\\q@t@q@t@MLMP]^WZMLg@j@a@d@W^INCNm@`FG\\ADCJGLGJMHIDGBG@OB_@?s@GOAMCWGSEOEg@OYKUKKCIEMIME]Ui@[mBoAKGSMMIWK[OWMa@Q_Aa@KGOIQQk@g@YUACCCACCEEOSk@K_@EKM[KUUg@KSGMKKa@c@uA}AeC}Bo@m@c@a@w@u@i@e@KGMGKEICQEOAK@KBKFQNOLYX"
+                    },
+                    "start_location": {
+                        "lat": 40.5926952,
+                        "lng": -74.4638208
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.6 mi",
+                        "value": 1015
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 81
+                    },
+                    "end_location": {
+                        "lat": 40.6200467,
+                        "lng": -74.4668137
+                    },
+                    "html_instructions": "Continue onto <b>Rock Rd E</b>",
+                    "polyline": {
+                        "points": "wf{vF`ppeMKDGBK@MCKCIEKMqDqEKMKKIOGOMWEMEOMmAC[COIKW]YYoBaDQYq@eAU]_@o@c@}@Um@KWMUOWMQ[e@GGGKQSSOKGUGUE[A_@?]?]Ea@Gi@OOC[?a@@eAHM?K?MCGAGEICKGKGIGKGOGGCSC"
+                    },
+                    "start_location": {
+                        "lat": 40.61307619999999,
+                        "lng": -74.4731262
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.5 mi",
+                        "value": 784
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 66
+                    },
+                    "end_location": {
+                        "lat": 40.62461640000001,
+                        "lng": -74.4731407
+                    },
+                    "html_instructions": "Continue onto <b>Washington Rock Rd</b>",
+                    "polyline": {
+                        "points": "ir|vFphoeMOBIBE@CBEBGF{@jA[\\QNWLGBSHSHc@RMF]ROJIJQPIHILS\\a@`AGTKVCLEPEVG`@If@Eb@Ct@C`@AVI|@Iv@Ix@MZCFMJgAt@KHoA`A]ZeBjBMJm@j@"
+                    },
+                    "start_location": {
+                        "lat": 40.6200467,
+                        "lng": -74.4668137
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "1.0 mi",
+                        "value": 1535
+                    },
+                    "duration": {
+                        "text": "2 mins",
+                        "value": 99
+                    },
+                    "end_location": {
+                        "lat": 40.63254149999999,
+                        "lng": -74.4588177
+                    },
+                    "html_instructions": "Turn <b>right</b> onto <b>Mountain Blvd</b>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "{n}vFbppeMq@eDQw@c@oBg@{BWoA]_BSu@SeAc@kBSs@M_@Qc@MQMSQSUWc@a@SOWSc@_@YW_BqASUQSW[c@i@]g@]i@QWO[EMIUEMEOMo@GWi@wC_@_BS_A[wAKe@K[IUCMEIEKGIKOMSQQU[g@u@mBmCsBiCu@aAqAiB}@qA"
+                    },
+                    "start_location": {
+                        "lat": 40.62461640000001,
+                        "lng": -74.4731407
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.3 mi",
+                        "value": 449
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 63
+                    },
+                    "end_location": {
+                        "lat": 40.6355471,
+                        "lng": -74.4586063
+                    },
+                    "html_instructions": "Turn <b>left</b> onto <b>Brookdale Rd</b>",
+                    "maneuver": "turn-left",
+                    "polyline": {
+                        "points": "k`_wFrvmeMUTUN{CdBe@XMJMP_A|A]\\q@sAyCwFGIIISI"
+                    },
+                    "start_location": {
+                        "lat": 40.63254149999999,
+                        "lng": -74.4588177
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "2.6 mi",
+                        "value": 4242
+                    },
+                    "duration": {
+                        "text": "5 mins",
+                        "value": 294
+                    },
+                    "end_location": {
+                        "lat": 40.6657008,
+                        "lng": -74.4822714
+                    },
+                    "html_instructions": "Sharp <b>left</b> onto <b>Stirling Rd</b>",
+                    "maneuver": "turn-sharp-left",
+                    "polyline": {
+                        "points": "es_wFhumeMCTCLAHELCJGPgErJ_AtBm@tAQ^g@jAWl@KRSd@EHCFENQl@{@xC]jAc@xASp@K\\IVOd@GLEHYl@s@~AMZo@|AWh@o@tAa@|@KPKJGHGDIFIDOFI@SDaCf@a@HKBOFQFIDGFGDGHGFSVWx@Md@Ib@UpAKj@Kf@EPIX]|@Sb@OZy@`BMV{@dBo@nAeEpI}A`D]f@c@|@a@v@Q`@EJGJYj@QTSVKLYXa@ZWLIDi@Pc@Hg@Do@@YDeBFu@Fu@DSBo@DiAB]@I@uA@eCHE@oAFmAF}AJ{AHaCNO@}@J_CRyAL_@?g@Bm@HQBu@N{@j@w@n@u@p@URKL_@ZSPk@h@[XSPSNUPSJUHODYF}AV{ATi@Hs@JyCf@OBi@F{@Ly@Lo@LUB[Dc@Fw@La@HOBK@_@DYD[Ds@N]DgBXg@HcANuAP_@DgAHWBA?eAH"
+                    },
+                    "start_location": {
+                        "lat": 40.6355471,
+                        "lng": -74.4586063
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.2 mi",
+                        "value": 387
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 44
+                    },
+                    "end_location": {
+                        "lat": 40.6691614,
+                        "lng": -74.482766
+                    },
+                    "html_instructions": "Continue onto <b>Plainfield Rd</b>",
+                    "polyline": {
+                        "points": "soewFdireMoCRiBLcBLW@uALqANG?mCR"
+                    },
+                    "start_location": {
+                        "lat": 40.6657008,
+                        "lng": -74.4822714
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.1 mi",
+                        "value": 234
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 37
+                    },
+                    "end_location": {
+                        "lat": 40.6697856,
+                        "lng": -74.48012539999999
+                    },
+                    "html_instructions": "Turn <b>right</b> onto <b>Valley Rd</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "gefwFhlreMk@mDYgBIa@?YKw@UuAGe@CI"
+                    },
+                    "start_location": {
+                        "lat": 40.6691614,
+                        "lng": -74.482766
+                    },
+                    "travel_mode": "DRIVING"
+                }
+            ],
+            "traffic_speed_entry": [],
+            "via_waypoint": []
+        }
+    ],
+    "overview_polyline": {
+        "points": "guwvF|_neMzL|TqMbOa_@rb@eThVqAzAiApAa@n@q@pFIb@KXUTQHWD_@?s@G]EcBc@eAa@cBaA{CoBmB{@kAi@a@[kAeA_@eAk@}Aa@{@SYwBaCuDkD{AwAu@m@u@W[?WJa@\\e@^SDYGUS}D_FU[Ug@K]QiBM[q@w@iE_HcAmBa@eAgAeBOSe@c@a@Oq@G}@?_AMy@S}@@sAHYCe@Sq@_@[GYFWPwAhBi@\\sAj@k@ZYV[Z]j@y@|B]rBOrCStBIx@MZQRsA~@mB|AsBvBm@j@q@eDu@gDqBaJw@qDa@sA_@u@_@g@y@y@k@c@qD_DkBaCo@aAUi@Oc@S_Aq@oDs@_Dg@}BUq@Wm@aAqAuCcEiDkEoC{Dk@d@aE~B[\\_A|A]\\kEkIQSSICTEVIX}HpQ}AlDc@fAoClJy@lC{AdDeCxFm@nASTQLYLaEx@w@X_@^SVWx@WhAa@|BQx@g@vAc@~@sDnHcHrNaAdBaApBk@`A_@d@{@t@a@RmAZwAFYDeBFkBLcAHgBDkFNwId@qCP}D^yAL_@?uALgAR{@j@w@n@kAdAk@h@oBfBi@`@i@Ti@LyDl@gG`A}IpAeFv@iHdAaCRcLx@gE^mCRk@mDc@iC?YKw@]{BCI"
+    },
+    "summary": "Stirling Rd",
+    "warnings": [],
+    "waypoint_order": []
+}
