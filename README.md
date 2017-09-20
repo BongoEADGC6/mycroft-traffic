@@ -1,6 +1,6 @@
 
 # Traffic Skill for Mycroft
-[![Build Status](https://travis-ci.org/BongoEADGC6/mycroft-traffic.svg?branch=master)](https://travis-ci.org/BongoEADGC6/mycroft-traffic)
+[![Stories in Ready](https://badge.waffle.io/BongoEADGC6/mycroft-traffic.svg?label=ready&title=Ready)](http://waffle.io/BongoEADGC6/mycroft-traffic) [![Build Status](https://travis-ci.org/BongoEADGC6/mycroft-traffic.svg?branch=master)](https://travis-ci.org/BongoEADGC6/mycroft-traffic)
 
 This is a skill to query travel times to points of interest (POIs) for
 [Mycroft](https://mycroft.ai). 

@@ -133,7 +133,16 @@ class TrafficSkill(MycroftSkill):
     def __get_address_from_pois(self, profile, poi_type, poi_name):
         address = self.poi_dict[profile][poi_type][poi_name]
 
-    def request_drive_time(self, message, depart_time, api_key):
+    def request_drive_time(self, message, depart_time):
+        itinerary = self.build_itinerary(message)
+        self.speak_dialog("welcome",
+                          data={'destination': itinerary['dest_name'],
+                                'origin': itinerary['origin_name']})
+        orig_enc = self.__convert_address(itinerary['origin'])
+        dest_enc = self.__convert_address(itinerary['destination'])
+
+
+    def request_drive_time_orig (self, message, depart_time, api_key):
         poi_dict = self.config.get('pois')
         itinerary = self.build_itinerary(message)
         self.speak_dialog("welcome",
