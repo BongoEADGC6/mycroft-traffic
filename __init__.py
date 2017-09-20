@@ -22,6 +22,7 @@ class GoogleMapsClient(object):
         except ValueError:
             return
 
+    @classmethod
     def traffic(self, **traffic_args):
         LOGGER.debug('Google API - Traffic')
         response = gmaps.directions(**traffic_args)
@@ -41,10 +42,16 @@ class GoogleMapsClient(object):
             route_summ = routes['summary']
         return duration_norm, duration_traffic, traffic_time, route_summ
 
+    @classmethod
     def distance(self, **dist_args):
         LOGGER.debug('Google API - Distance Matrix')
-        response = gmaps.distance_matrix(**dist_args)
-        return response
+        returned = gmaps.distance_matrix(**dist_args)
+        rows = returned['rows']
+        element = rows[0]
+        duration_norm = int(element['duration']['value']/60)
+        duration_traffic = int(element['duration_in_traffic']['value']/60)
+        traffic_time = duration_traffic - duration_norm
+        return duration_norm, duration_traffic, traffic_time
 
 
 class TrafficSkill(MycroftSkill):
@@ -90,21 +97,21 @@ class TrafficSkill(MycroftSkill):
         try:
             LOGGER.debug("Config Data: %s" % self.config)
             depart_time_now = str(int(time()))
-            self.request_drive_time(message, depart_time_now, self.api_key)
+            self.request_drive_time(message, depart_time_now)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
     def handle_traffic_later_intent(self, message):
         try:
             depart_time_now = str(int(time()))
-            self.request_drive_time(message, depart_time_now, self.api_key)
+            self.request_drive_time(message, depart_time_now)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
     def handle_proximity_intent(self, message):
         try:
             depart_time_now = str(int(time()))
-            self.request_distance(message, depart_time_now, self.api_key)
+            self.request_distance(message, depart_time_now)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
@@ -259,11 +266,24 @@ class TrafficSkill(MycroftSkill):
         duration_norm = drive_details[0]
         duration_traffic = drive_details[1]
         traffic_time = drive_details[2]
-        route_summ = drive_details[3]
-        self.speak_dialog('distance',
-                          data={'destination': itinerary['dest_name'],
-                                'trip_time': duration_norm,
-                                'origin': itinerary['origin'])
+        if traffic_time >= 20:
+            LOGGER.debug("Traffic = Heavy")
+            self.speak_dialog('distance.heavy',
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm,
+                                    'traffic_time': traffic_time})
+        # If traffic between 5 and 20 minutes, consider traffic a delay
+        elif traffic_time >= 5:
+            LOGGER.debug("Traffic = Delay")
+            self.speak_dialog('distance.delay',
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm,
+                                    'traffic_time': traffic_time})
+        else:
+            LOGGER.debug("Traffic = Clear")
+            self.speak_dialog('distance.clear',
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm})
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
