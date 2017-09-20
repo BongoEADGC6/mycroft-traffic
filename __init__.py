@@ -58,9 +58,7 @@ class TrafficSkill(MycroftSkill):
             self.dist_units = 'imperial'
         if provider == 'google':
             api_key = self.config.get('api_key', None)
-            self.maps = GoogleMapsClient(
-                self.config.get('api_key', None),
-                )
+            self.maps = GoogleMapsClient(api_key)
 
         self.poi_dict = self.config.get('pois')
 
@@ -262,6 +260,10 @@ class TrafficSkill(MycroftSkill):
         duration_traffic = drive_details[1]
         traffic_time = drive_details[2]
         route_summ = drive_details[3]
+        self.speak_dialog('distance',
+                          data={'destination': itinerary['dest_name'],
+                                'trip_time': duration_norm,
+                                'origin': itinerary['origin'])
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
