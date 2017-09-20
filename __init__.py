@@ -162,11 +162,11 @@ class TrafficSkill(MycroftSkill):
                           data={'destination': itinerary['dest_name'],
                                 'origin': itinerary['origin_name']})
         traffic_args = {
-                'origins': itinerary['origin'],
-                'destination': itinerary['destination'],
-                'mode': 'driving',
-                'units': self.dist_units
-                }
+            'origins': itinerary['origin'],
+            'destination': itinerary['destination'],
+            'mode': 'driving',
+            'units': self.dist_units
+            }
         drive_details = self.maps.Traffic(traffic_args)
         duration_norm = drive_details[0]
         duration_traffic = drive_details[1]
@@ -175,21 +175,21 @@ class TrafficSkill(MycroftSkill):
         if traffic_time >= 20:
             LOGGER.debug("Traffic = Heavy")
             self.speak_dialog('traffic.heavy',
-                    data={'destination': itinerary['dest_name'],
-                        'trip_time': duration_norm,
-                        'traffic_time': traffic_time})
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm,
+                                    'traffic_time': traffic_time})
         # If traffic between 5 and 20 minutes, consider traffic a delay
         elif traffic_time >= 5:
             LOGGER.debug("Traffic = Delay")
             self.speak_dialog('traffic.delay',
-                    data={'destination': itinerary['dest_name'],
-                        'trip_time': duration_norm,
-                        'traffic_time': traffic_time})
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm,
+                                    'traffic_time': traffic_time})
         else:
             LOGGER.debug("Traffic = Clear")
             self.speak_dialog('traffic.clear',
-                    data={'destination': itinerary['dest_name'],
-                        'trip_time': duration_norm})
+                              data={'destination': itinerary['dest_name'],
+                                    'trip_time': duration_norm})
 
     def request_drive_time_orig(self, message, depart_time, api_key):
         poi_dict = self.config.get('pois')
