@@ -167,10 +167,11 @@ class TrafficSkill(MycroftSkill):
             'mode': 'driving',
             'units': self.dist_units
             }
-        drive_details = self.maps.Traffic(traffic_args)
+        drive_details = self.maps.traffic(traffic_args)
         duration_norm = drive_details[0]
         duration_traffic = drive_details[1]
         traffic_time = drive_details[2]
+        route_summ = drive_details[3]
         # If traffic greater than 20 minutes, consider traffic heavy
         if traffic_time >= 20:
             LOGGER.debug("Traffic = Heavy")
@@ -244,6 +245,23 @@ class TrafficSkill(MycroftSkill):
 
         else:
             LOGGER.error(response.json())
+
+    def request_distance(self, message):
+        itinerary = self.build_itinerary(message)
+        self.speak_dialog("welcome",
+                          data={'destination': itinerary['dest_name'],
+                                'origin': itinerary['origin_name']})
+        dist_args = {
+            'origins': itinerary['origin'],
+            'destination': itinerary['destination'],
+            'mode': 'driving',
+            'units': self.dist_units
+            }
+        drive_details = self.maps.distance(dist_args)
+        duration_norm = drive_details[0]
+        duration_traffic = drive_details[1]
+        traffic_time = drive_details[2]
+        route_summ = drive_details[3]
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
