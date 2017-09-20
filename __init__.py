@@ -46,9 +46,13 @@ class GoogleMapsClient(object):
         response = self.gmaps.distance_matrix(**dist_args)
         LOGGER.debug("API Response: %s" % response)
         rows = response['rows']
-        element = rows[0]
+        # convert time to minutes
+        element = rows[0]['elements'][0]
         duration_norm = int(element['duration']['value']/60)
-        duration_traffic = int(element['duration_in_traffic']['value']/60)
+        if legs['duration_in_traffic']:
+            duration_traffic = int(element['duration_in_traffic']['value']/60)
+        else:
+            duration_traffic = duration_norm
         traffic_time = duration_traffic - duration_norm
         return duration_norm, duration_traffic, traffic_time
 
@@ -111,7 +115,7 @@ class TrafficSkill(MycroftSkill):
     def handle_proximity_intent(self, message):
         try:
             depart_time_now = str(int(time()))
-            self.request_distance(message, depart_time_now)
+            self.request_distance(message)
         except Exception as err:
             LOGGER.error("Error: {0}".format(err))
 
@@ -135,20 +139,26 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("Loading origin from profile...")
         try:
             origin_addr = self.poi_dict[origin_profile]['origins'][spkn_origin]
-        except Exception as err:
-            LOGGER.error("Falling back to home as origin -- %s" % err)
+        except KeyError:
+            LOGGER.error("Falling back to home as origin.")
             spkn_origin = "home"
             origin_addr = self.poi_dict[origin_profile]['origins']['home']
         LOGGER.debug("Origin Profile: %s" % origin_profile)
         LOGGER.debug("Origin Name: %s" % spkn_origin)
         LOGGER.debug("Origin Address: %s" % origin_addr)
         LOGGER.debug("Loading destination from profile...")
-
-        dest_addr = self.poi_dict[dest_profile]['destinations'][spoken_dest]
+        try:
+            dest_addr = self.poi_dict[dest_profile]['destinations'][spoken_dest]
+        except KeyError:
+            LOGGER.error("Destination not registered. Looking up Destination")
+            dest_addr = spoken_dest
         LOGGER.debug("Destination Profile: %s" % dest_profile)
         LOGGER.debug("Destination Name: %s" % spoken_dest)
         LOGGER.debug("Destination Address: %s" % dest_addr)
-        spoken_depart_time = message.data.get("Depart")
+        try:
+            spoken_depart_time = message.data.get("Depart")
+        except KeyError:
+            spoken_depart_time = 'now'
         itinerary_dict = {
             'origin_name': spkn_origin,
             'origin': origin_addr,
