@@ -22,11 +22,29 @@ class GoogleMapsClient(object):
         except ValueError:
             return
 
-    def gTraffic(self):
-        LOGGER.debug('Google Traffic')
+    def traffic(self, **traffic_args):
+        LOGGER.debug('Google API - Traffic')
+        response = gmaps.directions(**traffic_args)
+        if response.status_code == requests.codes.ok and \
+                response.json()['status'] == "REQUEST_DENIED":
+            LOGGER.error(response.json())
+            self.speak_dialog('traffic.error.api')
 
-    def gDistance(self):
-        LOGGER.debug('Google Distance')
+        elif response.status_code == requests.codes.ok:
+            LOGGER.debug("API Response: %s" % response)
+            routes = response.json()['routes'][0]
+            legs = routes['legs'][0]
+            # convert time to minutes
+            duration_norm = int(legs['duration']['value']/60)
+            duration_traffic = int(legs['duration_in_traffic']['value']/60)
+            traffic_time = duration_traffic - duration_norm
+            route_summ = routes['summary']
+        return duration_norm, duration_traffic, traffic_time, route_summ
+
+    def distance(self, **dist_args):
+        LOGGER.debug('Google API - Distance Matrix')
+        response = gmaps.distance_matrix(**dist_args)
+        return response
 
 
 class TrafficSkill(MycroftSkill):
@@ -35,10 +53,15 @@ class TrafficSkill(MycroftSkill):
         super(TrafficSkill, self).__init__("TrafficSkill")
         # TODO - Allow more providers (i.e. Google, OpenStreetMap, etc.)
         provider = self.config.get('provider', 'google')
+        self.dist_units = self.config.get("system_unit")
+        if self.dist_units == 'english':
+            self.dist_units = 'imperial'
         if provider == 'google':
+            api_key = self.config.get('api_key', None)
             self.maps = GoogleMapsClient(
-                self.config.get('api_key'),
+                self.config.get('api_key', None),
                 )
+
         self.poi_dict = self.config.get('pois')
 
     def initialize(self):
@@ -138,11 +161,37 @@ class TrafficSkill(MycroftSkill):
         self.speak_dialog("welcome",
                           data={'destination': itinerary['dest_name'],
                                 'origin': itinerary['origin_name']})
-        orig_enc = self.__convert_address(itinerary['origin'])
-        dest_enc = self.__convert_address(itinerary['destination'])
+        traffic_args = {
+                'origins': itinerary['origin'],
+                'destination': itinerary['destination'],
+                'mode': 'driving',
+                'units': self.dist_units
+                }
+        drive_details = self.maps.Traffic(traffic_args)
+        duration_norm = drive_details[0]
+        duration_traffic = drive_details[1]
+        traffic_time = drive_details[2]
+        # If traffic greater than 20 minutes, consider traffic heavy
+        if traffic_time >= 20:
+            LOGGER.debug("Traffic = Heavy")
+            self.speak_dialog('traffic.heavy',
+                    data={'destination': itinerary['dest_name'],
+                        'trip_time': duration_norm,
+                        'traffic_time': traffic_time})
+        # If traffic between 5 and 20 minutes, consider traffic a delay
+        elif traffic_time >= 5:
+            LOGGER.debug("Traffic = Delay")
+            self.speak_dialog('traffic.delay',
+                    data={'destination': itinerary['dest_name'],
+                        'trip_time': duration_norm,
+                        'traffic_time': traffic_time})
+        else:
+            LOGGER.debug("Traffic = Clear")
+            self.speak_dialog('traffic.clear',
+                    data={'destination': itinerary['dest_name'],
+                        'trip_time': duration_norm})
 
-
-    def request_drive_time_orig (self, message, depart_time, api_key):
+    def request_drive_time_orig(self, message, depart_time, api_key):
         poi_dict = self.config.get('pois')
         itinerary = self.build_itinerary(message)
         self.speak_dialog("welcome",
