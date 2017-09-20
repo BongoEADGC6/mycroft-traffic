@@ -2,7 +2,7 @@ from re import sub
 from time import time
 from os.path import dirname, join
 import requests
-
+import json
 
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill
@@ -17,36 +17,35 @@ class GoogleMapsClient(object):
 
     def __init__(self, api_key=None):
         import googlemaps
-        try:
-            gmaps = googlemaps.Client(key=api_key)
-        except ValueError:
-            return
+        self.gmaps = googlemaps.Client(key=api_key)
+        LOGGER.debug("Connected to Google API: %s" % self.gmaps)
 
-    @classmethod
     def traffic(self, **traffic_args):
         LOGGER.debug('Google API - Traffic')
-        response = gmaps.directions(**traffic_args)
-        if response.status_code == requests.codes.ok and \
-                response.json()['status'] == "REQUEST_DENIED":
-            LOGGER.error(response.json())
-            self.speak_dialog('traffic.error.api')
+        response = self.gmaps.directions(**traffic_args)[0]
+        # if response.status_code == requests.codes.ok and \
+        #        response.json()['status'] == "REQUEST_DENIED":
+        #    LOGGER.error(response.json())
+        #    self.speak_dialog('traffic.error.api')
 
-        elif response.status_code == requests.codes.ok:
-            LOGGER.debug("API Response: %s" % response)
-            routes = response.json()['routes'][0]
-            legs = routes['legs'][0]
-            # convert time to minutes
-            duration_norm = int(legs['duration']['value']/60)
+        # elif response.status_code == requests.codes.ok:
+        LOGGER.debug("API Response: %s" % json.dumps(response))
+        legs = response['legs'][0]
+        # convert time to minutes
+        duration_norm = int(legs['duration']['value']/60)
+        if legs['duration_in_traffic']:
             duration_traffic = int(legs['duration_in_traffic']['value']/60)
-            traffic_time = duration_traffic - duration_norm
-            route_summ = routes['summary']
+        else:
+            duration_traffic = duration_norm
+        traffic_time = duration_traffic - duration_norm
+        route_summ = routes['summary']
         return duration_norm, duration_traffic, traffic_time, route_summ
 
-    @classmethod
     def distance(self, **dist_args):
         LOGGER.debug('Google API - Distance Matrix')
-        returned = gmaps.distance_matrix(**dist_args)
-        rows = returned['rows']
+        response = self.gmaps.distance_matrix(**dist_args)
+        LOGGER.debug("API Response: %s" % response)
+        rows = response['rows']
         element = rows[0]
         duration_norm = int(element['duration']['value']/60)
         duration_traffic = int(element['duration_in_traffic']['value']/60)
@@ -60,13 +59,14 @@ class TrafficSkill(MycroftSkill):
         super(TrafficSkill, self).__init__("TrafficSkill")
         # TODO - Allow more providers (i.e. Google, OpenStreetMap, etc.)
         provider = self.config.get('provider', 'google')
+        LOGGER.debug("Configured Provider: %s" % provider)
         self.dist_units = self.config.get("system_unit")
         if self.dist_units == 'english':
             self.dist_units = 'imperial'
         if provider == 'google':
             api_key = self.config.get('api_key', None)
             self.maps = GoogleMapsClient(api_key)
-
+            LOGGER.debug("Connected to Google API: %s" % self.maps)
         self.poi_dict = self.config.get('pois')
 
     def initialize(self):
@@ -86,10 +86,10 @@ class TrafficSkill(MycroftSkill):
     def __build_traffic_later_intent(self):
         intent = IntentBuilder("TrafficLaterIntent").require("TrafficKeyword")\
             .require("Destination").optionally("Origin").build()
-        self.register_intent(intent, self.handle_traffic_now_intent)
+        self.register_intent(intent, self.handle_traffic_later_intent)
 
     def __build_proximity_intent(self):
-        intent = IntentBuilder("ProximityIntent").require("TrafficKeyword")\
+        intent = IntentBuilder("ProximityIntent").require("ProximityKeyword")\
             .require("Destination").optionally("Origin").build()
         self.register_intent(intent, self.handle_proximity_intent)
 
@@ -167,12 +167,12 @@ class TrafficSkill(MycroftSkill):
                           data={'destination': itinerary['dest_name'],
                                 'origin': itinerary['origin_name']})
         traffic_args = {
-            'origins': itinerary['origin'],
+            'origin': itinerary['origin'],
             'destination': itinerary['destination'],
             'mode': 'driving',
             'units': self.dist_units
             }
-        drive_details = self.maps.traffic(traffic_args)
+        drive_details = self.maps.traffic(**traffic_args)
         duration_norm = drive_details[0]
         duration_traffic = drive_details[1]
         traffic_time = drive_details[2]
@@ -258,14 +258,15 @@ class TrafficSkill(MycroftSkill):
                                 'origin': itinerary['origin_name']})
         dist_args = {
             'origins': itinerary['origin'],
-            'destination': itinerary['destination'],
+            'destinations': itinerary['destination'],
             'mode': 'driving',
             'units': self.dist_units
             }
-        drive_details = self.maps.distance(dist_args)
+        drive_details = self.maps.distance(**dist_args)
         duration_norm = drive_details[0]
         duration_traffic = drive_details[1]
         traffic_time = drive_details[2]
+        # If traffic greater than 20 minutes, consider traffic heavy
         if traffic_time >= 20:
             LOGGER.debug("Traffic = Heavy")
             self.speak_dialog('distance.heavy',

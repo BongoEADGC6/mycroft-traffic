@@ -1,2 +1,0 @@
-(for|to) (?P<destination>.*) from
-to (?P<destination>.*) from
