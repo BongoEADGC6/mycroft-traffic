@@ -65,7 +65,7 @@ class GoogleMapsClient(object):
         results = response['results']
         result = results[0]
         location = result['geometry']['location']
-        geo_loc = [ location['lat'], location['lng'] ]
+        geo_loc = [location['lat'], location['lng']]
         return geo_loc
 
     def places_nearby(self, **places_nearby_args):
@@ -77,9 +77,8 @@ class GoogleMapsClient(object):
         results = response['results']
         result = results[0]
         location = result['geometry']['location']
-        geo_loc = [ location['lat'], location['lng'] ]
+        geo_loc = [location['lat'], location['lng']]
         return geo_loc
-
 
 
 class TrafficSkill(MycroftSkill):
@@ -173,7 +172,8 @@ class TrafficSkill(MycroftSkill):
         LOGGER.debug("Origin Address: %s" % origin_addr)
         LOGGER.debug("Loading destination from profile...")
         try:
-            dest_addr = self.poi_dict[dest_profile]['destinations'][spoken_dest]
+            dest_prof_info = self.poi_dict[dest_profile]
+            dest_addr = dest_prof_info['destinations'][spoken_dest]
         except KeyError:
             LOGGER.error("Destination not registered. Looking up Destination")
             dest_addr = spoken_dest
