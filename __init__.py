@@ -44,7 +44,7 @@ class GoogleMapsClient(object):
     def distance(self, **dist_args):
         LOGGER.debug('Google API - Distance Matrix')
         response = self.gmaps.distance_matrix(**dist_args)
-        LOGGER.debug("API Response: %s" % response)
+        LOGGER.debug("API Response: %s" % json.dumps(response))
         rows = response['rows']
         # convert time to minutes
         element = rows[0]['elements'][0]
@@ -55,6 +55,31 @@ class GoogleMapsClient(object):
             duration_traffic = duration_norm
         traffic_time = duration_traffic - duration_norm
         return duration_norm, duration_traffic, traffic_time
+
+    def places(self, **places_args):
+        LOGGER.debug('Google API - Places')
+        response = self.gmaps.places(**places_args)
+        LOGGER.debug("API Response: %s" % json.dumps(response))
+        with open('/tmp/api_response.json', "w") as output:
+            output.write(json.dumps(response))
+        results = response['results']
+        result = results[0]
+        location = result['geometry']['location']
+        geo_loc = [ location['lat'], location['lng'] ]
+        return geo_loc
+
+    def places_nearby(self, **places_nearby_args):
+        LOGGER.debug('Google API - Places Nearby')
+        response = self.gmaps.places_nearby(**places_nearby_args)
+        LOGGER.debug("API Response: %s" % json.dumps(response))
+        with open('/tmp/api_response.json', "w") as output:
+            output.write(json.dumps(response))
+        results = response['results']
+        result = results[0]
+        location = result['geometry']['location']
+        geo_loc = [ location['lat'], location['lng'] ]
+        return geo_loc
+
 
 
 class TrafficSkill(MycroftSkill):
@@ -266,6 +291,22 @@ class TrafficSkill(MycroftSkill):
         self.speak_dialog("welcome",
                           data={'destination': itinerary['dest_name'],
                                 'origin': itinerary['origin_name']})
+        # Places Nearby API
+        places_nearby_args = {
+            'name': itinerary['destination'],
+            'location': itinerary['origin']
+            }
+        if "OpenNowKeyword" in message.data:
+            places_nearby_args['open_now'] = True
+        # nearby_places = self.maps.places_nearby(**places_nearby_args)
+        # Places API
+        places_args = {
+            'query': itinerary['destination'],
+            'location': itinerary['origin']
+            }
+        if "OpenNowKeyword" in message.data:
+            places_args['open_now'] = True
+        places = self.maps.places(**places_args)
         dist_args = {
             'origins': itinerary['origin'],
             'destinations': itinerary['destination'],
