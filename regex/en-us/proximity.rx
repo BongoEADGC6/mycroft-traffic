@@ -1,2 +1,2 @@
-(nearest|closest) (?P<destination>.*) (?:from|to)? (?P<origin>.*)
-
+(nearest|closest) (?P<destination>.*) (to|from)? (?P<origin>.*)
+(far|close) is (?P<destination>.*) (to|from)? (?P<origin>.*)

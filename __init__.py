@@ -27,7 +27,6 @@ class GoogleMapsClient(object):
         #        response.json()['status'] == "REQUEST_DENIED":
         #    LOGGER.error(response.json())
         #    self.speak_dialog('traffic.error.api')
-
         # elif response.status_code == requests.codes.ok:
         LOGGER.debug("API Response: %s" % json.dumps(response))
         legs = response['legs'][0]
@@ -49,7 +48,7 @@ class GoogleMapsClient(object):
         # convert time to minutes
         element = rows[0]['elements'][0]
         duration_norm = int(element['duration']['value']/60)
-        if legs['duration_in_traffic']:
+        if 'duration_in_traffic' in element.keys():
             duration_traffic = int(element['duration_in_traffic']['value']/60)
         else:
             duration_traffic = duration_norm
@@ -58,22 +57,27 @@ class GoogleMapsClient(object):
 
     def places(self, **places_args):
         LOGGER.debug('Google API - Places')
+        if places_args['location'].isnumeric() is False:
+            # Assumes first result is correct
+            geo_response = self.gmaps.geocode(places_args['location'])[0]
+            LOGGER.debug("API Response: %s" % json.dumps(geo_response))
+            source_coords = geo_response["geometry"]["location"]
+            places_args['location'] = "%s,%s" % (source_coords['lat'],
+                                                 source_coords['lng'])
+        LOGGER.debug('API Args: %s' % places_args)
         response = self.gmaps.places(**places_args)
-        LOGGER.debug("API Response: %s" % json.dumps(response))
-        with open('/tmp/api_response.json', "w") as output:
-            output.write(json.dumps(response))
         results = response['results']
-        result = results[0]
-        location = result['geometry']['location']
-        geo_loc = [location['lat'], location['lng']]
-        return geo_loc
+        closest_result = results[0]
+        LOGGER.debug("Closest Result: %s" % json.dumps(closest_result))
+        location = closest_result['geometry']['location']
+        geo_loc = "%s, %s" % (location['lat'], location['lng'])
+        geo_place_id = "place_id:%s" % closest_result['place_id']
+        return geo_place_id
 
     def places_nearby(self, **places_nearby_args):
         LOGGER.debug('Google API - Places Nearby')
         response = self.gmaps.places_nearby(**places_nearby_args)
         LOGGER.debug("API Response: %s" % json.dumps(response))
-        with open('/tmp/api_response.json', "w") as output:
-            output.write(json.dumps(response))
         results = response['results']
         result = results[0]
         location = result['geometry']['location']
@@ -307,6 +311,8 @@ class TrafficSkill(MycroftSkill):
         if "OpenNowKeyword" in message.data:
             places_args['open_now'] = True
         places = self.maps.places(**places_args)
+        LOGGER.debug("Places Module Result: %s" % places)
+        itinerary['destination'] = places
         dist_args = {
             'origins': itinerary['origin'],
             'destinations': itinerary['destination'],
@@ -323,19 +329,22 @@ class TrafficSkill(MycroftSkill):
             self.speak_dialog('distance.heavy',
                               data={'destination': itinerary['dest_name'],
                                     'trip_time': duration_norm,
-                                    'traffic_time': traffic_time})
+                                    'traffic_time': traffic_time,
+                                    'origin': itinerary['origin']})
         # If traffic between 5 and 20 minutes, consider traffic a delay
         elif traffic_time >= 5:
             LOGGER.debug("Traffic = Delay")
             self.speak_dialog('distance.delay',
                               data={'destination': itinerary['dest_name'],
                                     'trip_time': duration_norm,
-                                    'traffic_time': traffic_time})
+                                    'traffic_time': traffic_time,
+                                    'origin': itinerary['origin']})
         else:
             LOGGER.debug("Traffic = Clear")
             self.speak_dialog('distance.clear',
                               data={'destination': itinerary['dest_name'],
-                                    'trip_time': duration_norm})
+                                    'trip_time': duration_norm,
+                                    'origin': itinerary['origin']})
 
     def __convert_address(self, address):
         address_converted = sub(' ', '+', address)
