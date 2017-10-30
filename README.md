@@ -52,6 +52,7 @@ Currently the phrases are:
 * Include required start or arrival time
 * Include alternatives for navigation other than Google Maps API
  > [MapQuest](https://developer.mapquest.com/documentation/directions-api/)
+ 
  > [Bing Maps](https://msdn.microsoft.com/en-us/library/ff701718.aspx)
 
 ## In Development
